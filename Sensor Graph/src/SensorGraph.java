@@ -33,21 +33,21 @@ public class SensorGraph {
 		JComboBox<String> portList = new JComboBox<String>();
 		JButton connectButton = new JButton("Connect");
 		JPanel topPanel = new JPanel();
-		
 		topPanel.add(portList);
 		topPanel.add(connectButton);
 		window.add(topPanel, BorderLayout.NORTH);
 		
 		//populate drop down
-		SerialPort[] portNames = SerialPort.getCommPorts();
+		SerialPort[] portNames = SerialPort.getCommPorts(); //collect port names into array
 		for (int i = 0; i < portNames.length; i++) {
+			//add each port name item to the list of ports
 			portList.addItem(portNames[i].getSystemPortName());
 		}
 		
 		// create line graph
-		XYSeries series = new XYSeries("Light Sensor Readings");
-		XYSeriesCollection dataset = new XYSeriesCollection(series);
-		//dataset.addSeries(series);
+		XYSeries series = new XYSeries("Light Sensor Readings"); //create series unique to single set of data
+		XYSeriesCollection dataset = new XYSeriesCollection(series); //collect all series into single collection
+		//add collective data set to chart
 		JFreeChart chart = ChartFactory.createXYLineChart("Light Sensor Chart", "Time (seconds)", "Light", dataset);
 		window.add(new ChartPanel(chart), BorderLayout.CENTER);
 		
@@ -58,6 +58,7 @@ public class SensorGraph {
 					//attempt connection
 					chosenPort = SerialPort.getCommPort(portList.getSelectedItem().toString());
 					chosenPort.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 0, 0);
+					//attempt to open the port - if successful, set new text and disable drop down
 					if (chosenPort.openPort()) {
 						connectButton.setText("Disconnect");
 						portList.setEnabled(false);
@@ -66,24 +67,29 @@ public class SensorGraph {
 					//create a new thread that listens on serial
 					Thread thread = new Thread(){
 						@Override public void run() {
+							//define new Scanner receiving serial input
 							Scanner scanner = new Scanner(chosenPort.getInputStream());
 							while (scanner.hasNextLine()) {
+								//if stream has another line, parse and add to series
 								try {
-									String line = scanner.nextLine();
-									int number = Integer.parseInt(line);
-									series.add(x++, 1023 - number);	
-								} catch(Exception e) {}
-							}
+									String line = scanner.nextLine(); //get text
+									int number = Integer.parseInt(line); //parse text into integer
+									series.add(x++, 1023 - number);	//add int to data series
+								} catch(Exception e) {} //if error, skip
+							} //if no more lines, exit loop and close Scanner
 							scanner.close();
 						}
 					};
 					thread.start();
-				} else {
+				} else { //else, if button text equals "Disconnect" then perform these tasks
 					//disconnect from serial port
 					chosenPort.closePort();
+					//re-enable list of ports
 					portList.setEnabled(true);
+					//switch button text back to "Connect"
 					connectButton.setText("Connect");
 					//if wanted to clear data: series.clear(); /n x = 0;
+					// TODO: add button to clear data that is active only when stopped
 				}
 			}
 			
@@ -92,7 +98,6 @@ public class SensorGraph {
 		// display window
 		window.setVisible(true);
 		
-
 	}
 
 }
