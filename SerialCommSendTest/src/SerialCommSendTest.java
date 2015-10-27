@@ -19,7 +19,7 @@ import com.fazecast.jSerialComm.SerialPort;
 public class SerialCommSendTest {
 
 	static SerialPort chosenPort;
-	static int x = 0;
+	//static int seriesItemCounter = 0;
 
 	public static void main(String[] args) {
 		// create/configure the window
@@ -45,11 +45,11 @@ public class SerialCommSendTest {
 		}
 		
 		// create line graph
-		XYSeries series = new XYSeries("Light Sensor Readings"); //create series unique to single set of data
-		XYSeriesCollection dataset = new XYSeriesCollection(series); //collect all series into single collection
+		//XYSeries series = new XYSeries("Light Sensor Readings"); //create series unique to single set of data
+		//XYSeriesCollection dataset = new XYSeriesCollection(series); //collect all series into single collection
 		//add collective data set to chart
-		JFreeChart chart = ChartFactory.createXYLineChart("Light Sensor Chart", "Time (seconds)", "Light", dataset);
-		window.add(new ChartPanel(chart), BorderLayout.CENTER);
+		//JFreeChart chart = ChartFactory.createXYLineChart("Light Sensor Chart", "Time (seconds)", "Light", dataset);
+		//window.add(new ChartPanel(chart), BorderLayout.CENTER);
 		
 		// configure Connect button - use another thread to listen for data
 		connectButton.addActionListener(new ActionListener(){
@@ -64,8 +64,9 @@ public class SerialCommSendTest {
 						portList.setEnabled(false);
 					}
 					
+					// TODO: Create a new thread to communicates on serial - is new thread necessary though?
 					//create a new thread that listens on serial
-					Thread thread = new Thread(){
+					/*Thread thread = new Thread(){
 						@Override public void run() {
 							//define new Scanner receiving serial input
 							Scanner scanner = new Scanner(chosenPort.getInputStream());
@@ -74,13 +75,13 @@ public class SerialCommSendTest {
 								try {
 									String line = scanner.nextLine(); //get text
 									int number = Integer.parseInt(line); //parse text into integer
-									series.add(x++, 1023 - number);	//add int to data series
+									series.add(seriesItemCounter++, 1023 - number);	//add int to data series
 								} catch(Exception e) {} //if error, skip
 							} //if no more lines, exit loop and close Scanner
 							scanner.close();
 						}
 					};
-					thread.start();
+					thread.start();*/
 				} else { //else, if button text equals "Disconnect" then perform these tasks
 					//disconnect from serial port
 					chosenPort.closePort();
