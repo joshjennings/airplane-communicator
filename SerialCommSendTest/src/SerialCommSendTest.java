@@ -1,18 +1,22 @@
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Scanner;
+//import java.util.Scanner;
+import java.io.PrintWriter;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
+//import org.jfree.chart.ChartFactory;
+//import org.jfree.chart.ChartPanel;
+//import org.jfree.chart.JFreeChart;
+//import org.jfree.data.xy.XYSeries;
+//import org.jfree.data.xy.XYSeriesCollection;
 
 import com.fazecast.jSerialComm.SerialPort;
 
@@ -24,8 +28,8 @@ public class SerialCommSendTest {
 	public static void main(String[] args) {
 		// create/configure the window
 		JFrame window = new JFrame();
-		window.setTitle("Sensor Graph GUI");
-		window.setSize(600,400);
+		window.setTitle("Serial Test - Send to Arduino");
+		window.setSize(600,200);
 		window.setLayout(new BorderLayout());
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
@@ -51,6 +55,20 @@ public class SerialCommSendTest {
 		//JFreeChart chart = ChartFactory.createXYLineChart("Light Sensor Chart", "Time (seconds)", "Light", dataset);
 		//window.add(new ChartPanel(chart), BorderLayout.CENTER);
 		
+		// create text fields - Serial send and Serial receive
+		JTextField textEntry = new JTextField("Enter text here.", 30);
+		JTextArea textResult = new JTextArea("Text result", 1, 30);
+		JButton sendButton = new JButton("Send");
+		//add text fields to the window 
+		JPanel inputPanel = new JPanel();
+		JPanel outputPanel = new JPanel();
+		inputPanel.add(textEntry);
+		inputPanel.add(sendButton);
+		outputPanel.add(textResult);
+		window.add(inputPanel, BorderLayout.SOUTH);
+		window.add(outputPanel, BorderLayout.CENTER);
+		sendButton.setEnabled(false);
+		
 		// configure Connect button - use another thread to listen for data
 		connectButton.addActionListener(new ActionListener(){
 			@Override public void actionPerformed(ActionEvent e) {
@@ -62,9 +80,10 @@ public class SerialCommSendTest {
 					if (chosenPort.openPort()) {
 						connectButton.setText("Disconnect");
 						portList.setEnabled(false);
+						sendButton.setEnabled(true);
 					}
 					
-					// TODO: Create a new thread to communicates on serial - is new thread necessary though?
+					// TODO: Create a new thread to communicate on serial - is new thread necessary though?
 					//create a new thread that listens on serial
 					/*Thread thread = new Thread(){
 						@Override public void run() {
@@ -91,9 +110,22 @@ public class SerialCommSendTest {
 					connectButton.setText("Connect");
 					//if wanted to clear data: series.clear(); /n x = 0;
 					// TODO: add button to clear data that is active only when stopped
+					sendButton.setEnabled(false);
 				}
 			}
 			
+		});
+		
+		sendButton.addActionListener(new ActionListener(){
+			@Override public void actionPerformed(ActionEvent e) {
+				if (chosenPort.isOpen()) {
+					PrintWriter streamToArduino = new PrintWriter(chosenPort.getOutputStream());
+					streamToArduino.print("Test");
+					// TODO: configure streamToArduino for text input by user
+				} else {
+					textResult.setText("!!! Port is not configured !!!");
+				}
+			}
 		});
 		
 		// display window
