@@ -28,27 +28,8 @@ public class SerialCommSendTest {
 	//static int seriesItemCounter = 0;
 
 	public static void main(String[] args) {
-		// create/configure the window
-		JFrame window = new JFrame();
-		window.setTitle("Serial Test - Send to Arduino");
-		window.setSize(600,200);
-		window.setLayout(new BorderLayout());
-		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		// create drop down for connection options
-		JComboBox<String> portList = new JComboBox<String>();
-		JButton connectButton = new JButton("Connect");
-		JPanel topPanel = new JPanel();
-		topPanel.add(portList);
-		topPanel.add(connectButton);
-		window.add(topPanel, BorderLayout.NORTH);
-		
-		//populate drop down
-		SerialPort[] portNames = SerialPort.getCommPorts(); //collect port names into array
-		for (int i = 0; i < portNames.length; i++) {
-			//add each port name item to the list of ports
-			portList.addItem(portNames[i].getSystemPortName());
-		}
+		// create/configure the window :: MOVED CODE FROM HERE TO NEW CLASS "Window"
+		JFrame window = new Window();
 		
 		// create line graph
 		//XYSeries series = new XYSeries("Light Sensor Readings"); //create series unique to single set of data
