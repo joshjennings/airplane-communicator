@@ -1,7 +1,7 @@
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-//import java.util.Scanner;
+import java.util.Scanner;
 import java.io.PrintWriter;
 
 //import javax.swing.BoxLayout;
@@ -22,7 +22,9 @@ import com.fazecast.jSerialComm.SerialPort;
 
 public class SerialCommSendTest {
 
-	static SerialPort chosenPort;
+	static SerialPort commPort;
+	static Scanner streamFromArduino;
+	static PrintWriter streamToArduino;
 	//static int seriesItemCounter = 0;
 
 	public static void main(String[] args) {
@@ -74,10 +76,10 @@ public class SerialCommSendTest {
 			@Override public void actionPerformed(ActionEvent e) {
 				if(connectButton.getText().equals("Connect")) {
 					//attempt connection
-					chosenPort = SerialPort.getCommPort(portList.getSelectedItem().toString());
-					chosenPort.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 0, 0);
+					commPort = SerialPort.getCommPort(portList.getSelectedItem().toString());
+					commPort.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 0, 0);
 					//attempt to open the port - if successful, set new text and disable drop down
-					if (chosenPort.openPort()) {
+					if (commPort.openPort()) {
 						connectButton.setText("Disconnect");
 						portList.setEnabled(false);
 						sendButton.setEnabled(true);
@@ -103,7 +105,7 @@ public class SerialCommSendTest {
 					thread.start();*/
 				} else { //else, if button text equals "Disconnect" then perform these tasks
 					//disconnect from serial port
-					chosenPort.closePort();
+					commPort.closePort();
 					//re-enable list of ports
 					portList.setEnabled(true);
 					//switch button text back to "Connect"
@@ -118,10 +120,18 @@ public class SerialCommSendTest {
 		
 		sendButton.addActionListener(new ActionListener(){
 			@Override public void actionPerformed(ActionEvent e) {
-				if (chosenPort.isOpen()) {
-					PrintWriter streamToArduino = new PrintWriter(chosenPort.getOutputStream());
+				String textReceived;
+				//enter here if Send button is pushed
+				if (commPort.isOpen()) {
+					//send text to Arduino
+					streamToArduino = new PrintWriter(commPort.getOutputStream());
 					streamToArduino.print("Test");
 					// TODO: configure streamToArduino for text input by user
+					
+					//receive response
+					streamFromArduino = new Scanner(commPort.getInputStream());
+					textReceived = streamFromArduino.nextLine();
+					textResult.setText(textReceived);
 				} else {
 					textResult.setText("!!! Port is not configured !!!");
 				}
