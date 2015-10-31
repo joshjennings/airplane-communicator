@@ -71,26 +71,10 @@ public class Window {
 								connectButton.setText("Disconnect");
 								portList.setEnabled(false);
 								sendButton.setEnabled(true);
+								System.out.println("Comm port opened to " + commPort.getSystemPortName());
+							} else {
+								System.out.println("Port could not be opened!");
 							}
-							
-							// TODO: Create a new thread to communicate on serial - is new thread necessary though?
-							//create a new thread that listens on serial
-							/*Thread thread = new Thread(){
-								@Override public void run() {
-									//define new Scanner receiving serial input
-									Scanner scanner = new Scanner(chosenPort.getInputStream());
-									while (scanner.hasNextLine()) {
-										//if stream has another line, parse and add to series
-										try {
-											String line = scanner.nextLine(); //get text
-											int number = Integer.parseInt(line); //parse text into integer
-											series.add(seriesItemCounter++, 1023 - number);	//add int to data series
-										} catch(Exception e) {} //if error, skip
-									} //if no more lines, exit loop and close Scanner
-									scanner.close();
-								}
-							};
-							thread.start();*/
 						} else { //else, if button text equals "Disconnect" then perform these tasks
 							//disconnect from serial port
 							commPort.closePort();
@@ -101,6 +85,8 @@ public class Window {
 							//if wanted to clear data: series.clear(); /n x = 0;
 							// TODO: add button to clear data that is active only when stopped
 							sendButton.setEnabled(false);
+							
+							System.out.println("Comm port closed.");
 						}
 					}
 					
@@ -108,18 +94,20 @@ public class Window {
 				
 				sendButton.addActionListener(new ActionListener(){
 					@Override public void actionPerformed(ActionEvent e) {
-						String textReceived;
+						String textReceived1, textReceived2;
 						//enter here if Send button is pushed
 						if (commPort.isOpen()) {
 							//send text to Arduino
 							streamToArduino = new PrintWriter(commPort.getOutputStream());
-							streamToArduino.print("Test");
+							streamToArduino.print(textEntry.getText());
+							System.out.println(textEntry.getText());
 							// TODO: configure streamToArduino for text input by user
 							
 							//receive response
 							streamFromArduino = new Scanner(commPort.getInputStream());
-							textReceived = streamFromArduino.nextLine();
-							textResult.setText(textReceived);
+							textReceived1 = streamFromArduino.nextLine();
+							textReceived2 = streamFromArduino.nextLine();
+							textResult.setText(textReceived1 + " " + textReceived2);
 						} else {
 							textResult.setText("!!! Port is not configured !!!");
 						}
