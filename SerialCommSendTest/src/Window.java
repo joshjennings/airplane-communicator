@@ -15,6 +15,8 @@ import com.fazecast.jSerialComm.SerialPort;
 
 public class Window {
 	
+	JFrame windowFrame;
+	
 	static SerialPort commPort;
 	static Scanner streamFromArduino;
 	static PrintWriter streamToArduino;
@@ -22,11 +24,11 @@ public class Window {
 	public Window() {
 		Thread thread = new Thread(){
 			@Override public void run() {
-				JFrame window = new JFrame();
-				window.setTitle("Serial Test - Send to Arduino");
-				window.setSize(600,200);
-				window.setLayout(new BorderLayout());
-				window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				windowFrame = new JFrame();
+				windowFrame.setTitle("Serial Test - Send to Arduino");
+				windowFrame.setSize(600,200);
+				windowFrame.setLayout(new BorderLayout());
+				windowFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 				// create drop down for connection options
 				JComboBox<String> portList = new JComboBox<String>();
@@ -34,7 +36,7 @@ public class Window {
 				JPanel topPanel = new JPanel();
 				topPanel.add(portList);
 				topPanel.add(connectButton);
-				window.add(topPanel, BorderLayout.NORTH);
+				windowFrame.add(topPanel, BorderLayout.NORTH);
 
 				//populate drop down
 				SerialPort[] portNames = SerialPort.getCommPorts(); //collect port names into array
@@ -53,8 +55,8 @@ public class Window {
 				inputPanel.add(textEntry);
 				inputPanel.add(sendButton);
 				outputPanel.add(textResult);
-				window.add(inputPanel, BorderLayout.SOUTH);
-				window.add(outputPanel, BorderLayout.CENTER);
+				windowFrame.add(inputPanel, BorderLayout.SOUTH);
+				windowFrame.add(outputPanel, BorderLayout.CENTER);
 				sendButton.setEnabled(false);
 				
 				// configure Connect button - use another thread to listen for data
@@ -125,7 +127,7 @@ public class Window {
 				});
 				
 				// display window
-				window.setVisible(true);
+				windowFrame.setVisible(true);
 			}
 		};
 		thread.start();
